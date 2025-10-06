@@ -2,11 +2,11 @@
 #include <HTTPClient.h>
 #include <SPIFFS.h>
 
-// 🔧 Wi-Fi credentials
+//  Wi-Fi credentials
 const char* ssid = "OnePlus Sethu";
 const char* password = "252087200";
 
-// 🌐 Public file URL and SPIFFS path
+//  Public file URL and SPIFFS path
 const char* fileURL = "http://www.textfiles.com/100/captmidn.txt";
 const char* filePath = "/downloaded.txt";
 
@@ -17,9 +17,9 @@ void setup() {
   delay(2000);
   Serial.println("🔌 ESP32 booting...");
 
-  // 📶 Connect to Wi-Fi with timeout
+  //  Connect to Wi-Fi with timeout
   WiFi.begin(ssid, password);
-  Serial.print("🔄 Connecting to WiFi");
+  Serial.print("Connecting to WiFi");
   int attempts = 0;
   while (WiFi.status() != WL_CONNECTED && attempts < 20) {
     delay(500);
@@ -28,20 +28,20 @@ void setup() {
   }
 
   if (WiFi.status() != WL_CONNECTED) {
-    Serial.println("\n❌ Failed to connect to WiFi");
+    Serial.println("\n Failed to connect to WiFi");
     return;
   }
 
-  Serial.println("\n✅ Connected to WiFi");
+  Serial.println("\n Connected to WiFi");
   Serial.print("📡 Local IP: ");
   Serial.println(WiFi.localIP());
 
-  // 📁 Mount SPIFFS
+  //  Mount SPIFFS
   if (!SPIFFS.begin(true)) {
-    Serial.println("❌ SPIFFS Mount Failed");
+    Serial.println(" SPIFFS Mount Failed");
     while (true) delay(1000);
   }
-  Serial.println("✅ SPIFFS Mounted Successfully");
+  Serial.println("SPIFFS Mounted Successfully");
 }
 
 void loop() {
@@ -54,19 +54,19 @@ void loop() {
 
 void downloadFileHTTP(const char* url, const char* path) {
   HTTPClient http;
-  http.setTimeout(10000);  // ⏱️ Set timeout to 10 seconds
+  http.setTimeout(10000);  //  Set timeout to 10 seconds
   http.begin(url);
 
   int httpCode = http.GET();
   if (httpCode != HTTP_CODE_OK) {
-    Serial.printf("❌ HTTP GET failed, error: %s\n", http.errorToString(httpCode).c_str());
+    Serial.printf(" HTTP GET failed, error: %s\n", http.errorToString(httpCode).c_str());
     http.end();
     return;
   }
 
   File file = SPIFFS.open(path, FILE_WRITE);
   if (!file) {
-    Serial.println("❌ Failed to open file for writing");
+    Serial.println("Failed to open file for writing");
     http.end();
     return;
   }
@@ -75,7 +75,7 @@ void downloadFileHTTP(const char* url, const char* path) {
   uint8_t buffer[1024];
   int written = 0;
 
-  // 📥 Read stream and write to SPIFFS
+  // Read stream and write to SPIFFS
   while (stream->available()) {
     int bytesRead = stream->readBytes(buffer, sizeof(buffer));
     if (bytesRead > 0) {
@@ -87,17 +87,17 @@ void downloadFileHTTP(const char* url, const char* path) {
 
   file.close();
   http.end();
-  Serial.printf("✅ Downloaded %d bytes to %s\n", written, path);
+  Serial.printf(" Downloaded %d bytes to %s\n", written, path);
 }
 
 void validateDownloadedFile(const char* path) {
   File file = SPIFFS.open(path, FILE_READ);
   if (!file) {
-    Serial.println("❌ Failed to open file for reading");
+    Serial.println(" Failed to open file for reading");
     return;
   }
 
-  Serial.println("📄 File contents:");
+  Serial.println(" File contents:");
   while (file.available()) {
     Serial.write(file.read());
   }
